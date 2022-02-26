@@ -33,11 +33,15 @@ const UserSchema = new Schema(
     password: {
       type: String,
       required: [true, "Please provide password"],
-      //   select: false,
     },
     phoneNumber: {
       type: Number,
       required: [true, "Please provide phone number"],
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
     },
   },
   { timestamps: true }
