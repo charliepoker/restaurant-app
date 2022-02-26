@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
+const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 const app = express();
 app.use(express.json());
@@ -20,8 +21,12 @@ app.get("/", (req, res) => {
 // routes
 const userRouter = require("./routes/user.routes");
 const authRouter = require("./routes/auth.routes");
+const productRouter = require("./routes/product.routes");
 app.use("/api/users", userRouter);
 app.use("/api/users", authRouter);
+app.use("/api/products", productRouter);
+
+app.use(errorHandlerMiddleware);
 
 const PORT = process.env.PORT || 3000;
 

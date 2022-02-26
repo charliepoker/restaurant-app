@@ -1,11 +1,30 @@
 const User = require("../models/user");
+const { BadRequestError, NotFoundError } = require("../errors");
+const { StatusCodes } = require("http-status-codes");
 
+// Get a user
 const getUser = async (req, res) => {
-  res.send(" This is the  get user route");
+  const { id: userId } = req.params;
+
+  try {
+    const user = await User.findById({ _id: userId }).select("-password");
+    if (!user) {
+      throw new NotFoundError(`No job with id ${userId}`);
+    }
+    res.status(StatusCodes.OK).json({ user });
+  } catch (error) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: error.message,
+    });
+  }
 };
+
+// Get Users
 const getUsers = async (req, res) => {
-  res.send(" This is the get users route");
+  const users = await User.find({}).select("-password");
+  res.status(200).json({ users });
 };
+
 const updateUser = async (req, res) => {
   res.send(" This is the update user route");
 };
