@@ -1,23 +1,35 @@
 const User = require("../models/user");
-const bcrypt = require("bcryptjs");
+const { StatusCodes } = require("http-status-codes");
 const { createToken } = require("../utils/jwt");
+const CustomAPIError = require("../errors");
+
 
 const registerUser = async (req, res) => {
   try {
     const { firstname, lastname, username, email, password, phoneNumber } =
       req.body;
 
-    let user = await User.findOne({ email });
-
-    if (user) {
-      return res.status(400).send({
-        message: "User already exists",
-      });
+    // check if email already exists
+    const emailAlreadyExists = await User.findOne({ email });
+    if (emailAlreadyExists) {
+      throw new CustomAPIError.BadRequestError("Email already exists");
     }
 
-    user = await User.create({ ...req.body });
+    // first registered user is an admin
+    const isFirstAccount = (await User.countDocuments({})) === 0;
+    const role = isFirstAccount ? "admin" : "user";
 
-    const token = createToken(user._id, user.email);
+    user = await User.create({
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+      phoneNumber,
+      role,
+    });
+
+    const token = createToken(user._id, user.email, user.role);
 
     const oneDay = 1000 * 60 * 60 * 24;
 
@@ -28,11 +40,12 @@ const registerUser = async (req, res) => {
       signed: true,
     });
 
-    res.status(200).json({
+    res.status(StatusCodes.CREATED).json({
       message: "user successfully registered",
       user: {
         userId: user._id,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -54,17 +67,17 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email }).exec();
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      // return res.status(404).json({ message: "User not found" });
+      throw new CustomAPIError.UnauthenticatedError("Invalid Credentials");
     }
 
     isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(406).json({ message: "Incorrect password, Try again" });
+      // return res.status(406).json({ message: "Incorrect password, Try again" });
+      throw new CustomAPIError.UnauthenticatedError("Invalid Credentials");
     }
 
-   
-
-    const token = createToken(user._id, user.email);
+    const token = creatvToken(user._id, user.email);
 
     const oneDay = 1000 * 60 * 60 * 24;
 
@@ -75,12 +88,9 @@ const loginUser = async (req, res) => {
       signed: true,
     });
 
-    res.status(200).json({
+    res.status(StatusCodes.OK).json({
       message: "User successfully logged in",
-      user: {
-        userId: user._id,
-        email: user.email,
-      },
+      token,
     });
   } catch (error) {
     res.status(500).json({

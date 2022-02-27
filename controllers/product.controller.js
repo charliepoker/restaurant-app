@@ -1,8 +1,11 @@
 const Product = require("../models/product");
+const { StatusCodes } = require("http-status-codes");
+const CustomAPIError = require("../errors");
+const user = require("../models/user");
 
 // Create a product
 const createProduct = async (req, res) => {
-  res.send(" This is the create product route");
+  res.send("This is the create product route")
 };
 // Get a product
 const getProduct = async (req, res) => {
