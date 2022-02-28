@@ -1,27 +1,26 @@
 require("dotenv").config();
+const User = require("../models/user");
+const CustomError = require("../errors");
 const jwt = require("jsonwebtoken");
 
-const authenticateUser = (req, res, next) => {
+const authenticateUser = async (req, res, next) => {
   // check header
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer")) {
-    return res.status(401).json({ message: "Invalid Bearer token" });
-  }
-  const token = authHeader.split(" ")[1];
+  let token = req.headers["x-access-token"];
 
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    // attach the user to the job routes
-    req.user = { userId: payload.userId, email: payload.email };
-    console.log(req.user);
+  console.log(token);
+
+  if (!token) {
+    return res.status(403).json({ message: "invalid token" });
+  }
+
+  jwt.verify(token, "secret", (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Unauthorized!" });
+    }
+    req.userId = decoded.id;
+    console.log(decoded);
     next();
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Authentication Invalid", error: error.message });
-  }
+  });
 };
 
-module.exports = {
-  authenticateUser,
-};
+module.exports = { authenticateUser };
