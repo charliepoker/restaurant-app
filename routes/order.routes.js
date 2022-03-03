@@ -4,8 +4,6 @@ const {
   createOrder,
   getAllOrder,
   getOrder,
-  updateOrder,
-  deleteOrder,
 } = require("../controllers/order.controller");
 const {
   authenticateUser,
@@ -13,6 +11,6 @@ const {
 } = require("../middlewares/auth");
 
 router.route("/").post(authenticateUser, createOrder).get(getAllOrder);
-router.route("/:id").get(getOrder).patch(updateOrder).delete(deleteOrder);
+router.route("/:id").get(getOrder);
 
 module.exports = router;

@@ -26,16 +26,8 @@ const getUsers = async (req, res) => {
   res.status(200).json({ users });
 };
 
-const updateUser = async (req, res) => {
-  res.send(" This is the update user route");
-};
-const deleteUser = async (req, res) => {
-  res.send(" This is the delete user route");
-};
 
 module.exports = {
   getUser,
   getUsers,
-  updateUser,
-  deleteUser,
 };
