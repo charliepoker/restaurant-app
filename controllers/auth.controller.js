@@ -4,9 +4,8 @@ const { createToken } = require("../utils/jwt");
 const CustomAPIError = require("../errors");
 const asyncHandler = require("../middlewares/async");
 
-
 // @desc      Register user
-// @route     POST /api/v1/auth/register
+// @route     POST /api/users/register
 // @access    Public
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -64,9 +63,8 @@ const registerUser = asyncHandler(async (req, res) => {
   // }
 });
 
-
 // @desc      Login user
-// @route     POST /api/v1/auth/login
+// @route     POST /api/users/login
 // @access    Public
 
 const loginUser = asyncHandler(async (req, res) => {

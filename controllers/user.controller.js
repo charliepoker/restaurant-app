@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const { BadRequestError, NotFoundError } = require("../errors");
+const CustomAPIError = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 
 // Get a user
@@ -9,7 +10,7 @@ const getUser = async (req, res) => {
   try {
     const user = await User.findById({ _id: userId }).select("-password");
     if (!user) {
-      throw new NotFoundError(`No job with id ${userId}`);
+      throw new CustomAPIError.NotFoundError(`No user with id ${userId}`);
     }
     res.status(StatusCodes.OK).json({ user });
   } catch (error) {

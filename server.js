@@ -22,9 +22,13 @@ app.get("/", (req, res) => {
 const userRouter = require("./routes/user.routes");
 const authRouter = require("./routes/auth.routes");
 const productRouter = require("./routes/product.routes");
+const orderRouter = require("./routes/order.routes");
+const reviewRouter = require("./routes/review.routes");
 app.use("/api/users", userRouter);
 app.use("/api/users", authRouter);
 app.use("/api/products", productRouter);
+app.use("/api/orders", orderRouter);
+app.use("/api/reviews", reviewRouter);
 
 app.use(errorHandlerMiddleware);
 
