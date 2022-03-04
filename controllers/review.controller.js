@@ -1,24 +1,31 @@
 const Product = require("../models/product");
 const Review = require("../models/review");
 const { StatusCodes } = require("http-status-codes");
-const CustomAPIError = require("../errors");
 const asyncHandler = require("../middlewares/async");
+const ErrorResponse = require("../utils/errorResponse");
 
 // @desc      Create a review
 // @route     POST /api/reviews
 // @access    Public
 
 const createReview = asyncHandler(async (req, res, next) => {
+  const { comment } = req.body;
   const productId = req.body.product;
+
+  if (!comment) {
+    return next(
+      new ErrorResponse("provide required feilds", StatusCodes.BAD_REQUEST)
+    );
+  }
 
   const isValidProduct = await Product.findById({ _id: productId });
   if (!isValidProduct) {
-    throw new CustomAPIError.NotFoundError(`No Review with id ${productId}`);
+    return next(new ErrorResponse());
   }
+
   req.body.user = req.user;
   const review = await Review.create(req.body);
   res.status(StatusCodes.CREATED).json({ review });
-  // res.status(500).json({ error: error });
 });
 
 // @desc      Get all reviews
@@ -38,9 +45,8 @@ const getReview = asyncHandler(async (req, res, next) => {
   const review = await Review.findById({ _id: reviewId });
 
   if (!review) {
-    throw new CustomAPIError.NotFoundError("Review not foud");
+    return next(new ErrorResponse());
   }
-
   res.status(StatusCodes.OK).json({ review });
 });
 // @desc     Update a review
@@ -54,7 +60,7 @@ const updateReview = asyncHandler(async (req, res) => {
   const review = await Review.findOne({ _id: reviewId });
 
   if (!review) {
-    throw new CustomError.NotFoundError(`No review with id ${reviewId}`);
+    return next(new ErrorResponse());
   }
   review.comment = comment;
 
@@ -71,7 +77,7 @@ const deleteReview = asyncHandler(async (req, res) => {
   const review = await Review.findOne({ _id: reviewId });
 
   if (!review) {
-    throw new CustomError.NotFoundError(`No review with id ${reviewId}`);
+    return next(new ErrorResponse());
   }
 
   await review.remove();

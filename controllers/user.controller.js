@@ -1,32 +1,24 @@
 const User = require("../models/user");
-const { BadRequestError, NotFoundError } = require("../errors");
-const CustomAPIError = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+const asyncHandler = require("../middlewares/async");
+const ErrorResponse = require("../utils/errorResponse");
 
 // Get a user
-const getUser = async (req, res) => {
+const getUser = asyncHandler(async (req, res, next) => {
   const { id: userId } = req.params;
 
-  try {
-    const user = await User.findById({ _id: userId }).select("-password");
-    if (!user) {
-      throw new CustomAPIError.NotFoundError(`No user with id ${userId}`);
-    }
-    res.status(StatusCodes.OK).json({ user });
-  } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: error.message,
-    });
+  const user = await User.findById({ _id: userId }).select("-password");
+  if (!user) {
+    return next(new ErrorResponse());
   }
-};
+  res.status(StatusCodes.OK).json({ user });
+});
 
 // Get Users
-const getUsers = async (req, res) => {
+const getUsers = asyncHandler(async (req, res, next) => {
   const users = await User.find({}).select("-password");
   res.status(200).json({ users });
-};
-
-
+});
 module.exports = {
   getUser,
   getUsers,
