@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 const Order = require("../models/order");
 const { StatusCodes } = require("http-status-codes");
-const CustomAPIError = require("../errors");
+const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middlewares/async");
 
 // @desc      Create a order
@@ -13,7 +13,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
 
   const isValidProduct = await Product.findById({ _id: productId });
   if (!isValidProduct) {
-    throw new CustomAPIError.NotFoundError(`No Review with id ${productId}`);
+    return next(new ErrorResponse());
   }
   req.body.user = req.user;
   const order = await Order.create(req.body);
@@ -32,15 +32,14 @@ const getAllOrder = asyncHandler(async (req, res) => {
 // @route     GET /api/orders
 // @access    Public
 
-const getOrder = async (req, res) => {
+const getOrder = asyncHandler(async (req, res, next) => {
   const { id: orderId } = req.params;
-  const order = await Order.find({ _id: orderId });
+  const order = await Order.findById({ _id: orderId });
   if (!order) {
-    throw new CustomAPIError.NotFoundError("Review not foud");
+    return next(new ErrorResponse());
   }
   res.status(StatusCodes.OK).json({ order });
-};
-
+});
 
 module.exports = {
   createOrder,

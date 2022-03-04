@@ -1,30 +1,33 @@
-const { StatusCodes } = require("http-status-codes");
+// const { StatusCodes } = require("http-status-codes");
+const ErrorResponse = require("../utils/errorResponse");
 
 const errorHandlerMiddleware = (err, req, res, next) => {
-  let customError = {
-    // set default
-    statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-    msg: err.message || "Something went wrong try again later",
-  };
+  let error = { ...err };
 
-  if (err.name === "ValidationError") {
-    customError.msg = Object.values(err.errors)
-      .map((item) => item.message)
-      .join(",");
-    customError.statusCode = 400;
-  }
-  if (err.code && err.code === 11000) {
-    customError.msg = `Duplicate value entered for ${Object.keys(
-      err.keyValue
-    )} field, please choose another value`;
-    customError.statusCode = 400;
-  }
+  error.message = err.message;
+
+  // Mongoose bad ObjectId
   if (err.name === "CastError") {
-    customError.msg = `No item found with id : ${err.value}`;
-    customError.statusCode = 404;
+    const message = `Resource not found`;
+    error = new ErrorResponse(message, 404);
   }
 
-  return res.status(customError.statusCode).json({ msg: customError.msg });
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    const message = "Duplicate field value entered";
+    error = new ErrorResponse(message, 400);
+  }
+
+  // Mongoose validation error
+  if (err.name === "ValidationError") {
+    const message = Object.values(err.errors).map((val) => val.message);
+    error = new ErrorResponse(message, 400);
+  }
+
+  res.status(error.statusCode || 500).json({
+    success: false,
+    error: error.message || "Server Error",
+  });
 };
 
 module.exports = errorHandlerMiddleware;
