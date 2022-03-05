@@ -16,28 +16,30 @@ const UserSchema = new Schema(
       required: [true, "Please provide lastName"],
       minlength: 3,
       maxlength: 50,
-    },
-    username: {
-      type: String,
-      required: [true, "Please provide username"],
-      unique: true,
-      minlength: 3,
-      maxlength: 50,
-    },
+    }, 
     email: {
       type: String,
       required: [true, "Please provide email"],
       unique: true,
       lowercase: true,
+       "index": { "unique": true, "sparse": true },
+      match: [
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please add a valid email",
+      ],
     },
     password: {
       type: String,
       required: [true, "Please provide password"],
-      //   select: false,
     },
     phoneNumber: {
       type: Number,
       required: [true, "Please provide phone number"],
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
     },
   },
   { timestamps: true }
