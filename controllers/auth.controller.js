@@ -13,7 +13,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
   // check if all fields are typed
   if (!firstname || !lastname || !email || !password || !phoneNumber) {
-    
     return next(
       new ErrorResponse(
         "Please provide all required fields",
@@ -62,7 +61,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 // @desc      Login user
 // @route     POST /api/users/login
 // @access    Public
@@ -88,19 +86,18 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
   isMatch = await user.comparePassword(password);
   if (!isMatch) {
-    
-   return next(
-     new ErrorResponse("Invalid Credentials", StatusCodes.UNAUTHORIZED)
-   );
+    return next(
+      new ErrorResponse("Invalid Credentials", StatusCodes.UNAUTHORIZED)
+    );
   }
 
   const token = createToken(user._id);
 
-  const oneDay = 1000 * 60 * 60 * 24;
+ 
 
   res.cookie("token", token, {
     httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
     secure: process.env.NODE === "production",
     signed: true,
   });
