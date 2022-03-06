@@ -53,7 +53,7 @@ const getReview = asyncHandler(async (req, res, next) => {
 // @route    PATCH /api/reviews/:id
 // @access    Public
 
-const updateReview = asyncHandler(async (req, res) => {
+const updateReview = asyncHandler(async (req, res, next) => {
   const { id: reviewId } = req.params;
   const { comment } = req.body;
 
