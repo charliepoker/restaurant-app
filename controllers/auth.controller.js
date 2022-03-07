@@ -42,11 +42,9 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
   const token = createToken(user._id);
 
-  const oneDay = 1000 * 60 * 60 * 24;
-
   res.cookie("token", token, {
     httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
     secure: process.env.NODE === "production",
     signed: true,
   });
@@ -92,8 +90,6 @@ const loginUser = asyncHandler(async (req, res, next) => {
   }
 
   const token = createToken(user._id);
-
- 
 
   res.cookie("token", token, {
     httpOnly: true,
