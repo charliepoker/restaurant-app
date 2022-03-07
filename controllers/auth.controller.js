@@ -45,8 +45,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
   res.cookie("token", token, {
     httpOnly: true,
     expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-    secure: process.env.NODE === "production",
-    signed: true,
+    // secure: process.env.NODE === "production",
+    // signed: true,
   });
 
   res.status(StatusCodes.CREATED).json({
