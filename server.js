@@ -2,12 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
+ 
+app.use(cors());
 app.use(cookieParser(process.env.JWT_SECRET));
 
 // setup morgan
